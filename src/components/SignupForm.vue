@@ -1,22 +1,25 @@
 <template>
-    <form @submit.prevent="submit">
+    <form @submit.prevent="handleSubmit">
     <label>Email:</label>
-    <input type="email" name="x_email" required v-model="email">
+    <input type="text" ref="email" v-model="email" @keypress="resetForm">
     <label>Password:</label>
-    <input type="password" name="x_password" required v-model="password">
+    <input type="password" ref="password" v-model="password">
 <label>Role</label>
-<select v-bind="role">
+<select v-bind="role" ref="role">
     <option value="0">Select role</option>
     <option v-for="role in roleOptions" :value="role.value" :key="role.value">{{role.name}}</option> 
 </select>
 <label>Skills</label>
-<input type="text" placeholder="Enter a skill and press enter" v-model="tempskill" @keydown.enter="editskills">
+<input type="text" ref="skills" placeholder="Enter a skill and press enter" v-model="tempskill" @keydown.enter="editskills">
 <div class="theskills" v-if="showSkills">
     <a href="#" class="skill" v-for="skill in skills" :key="skill" @click="removeskill">{{skill}}</a> 
 </div>
-<div class="terms">
-    <input type="checkbox" v-model="terms" required>
+<div class="terms" ref="terms">
+    <input type="checkbox" v-model="terms">
     <label>Accept terms and conditions</label>
+</div>
+<div class="submit">
+    <button>Create an account</button>
 </div>
   </form>
   <p>{{skills}}</p>
@@ -38,8 +41,17 @@ export default {
         }
     },
     methods:{
-        submit(){
-            return false
+        handleSubmit(){
+            //console.log(this.$refs.email)
+            //this.$refs('email').classList.add('error')
+            //return false
+            const Vemail =  /^[\w\.]+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/
+            if(!Vemail.test(this.email)){
+                this.$refs.email.classList.add('error')
+                this.$refs.email.focus()
+                
+            }
+
         },
         editskills(){
             if(this.tempskill==='') return
@@ -60,6 +72,15 @@ export default {
             if(this.skills.length===0){
                 this.showSkills=false
             }    
+        },
+        resetForm(){
+            let theform = document.querySelector('form');
+         
+            let i=0
+            while(i<theform.length){
+                theform[i].classList.remove('error')
+                i++
+            }
         }
     }
 }
@@ -91,6 +112,7 @@ form {
     border: none;
     border-bottom: 1px solid #ddd;
     color: #555;
+ 
   }
   input[type='checkbox']{
       position: relative;
@@ -98,6 +120,9 @@ form {
       margin:0 10px 0 0;
       width:16px;
       display: inline-block;
+  }
+  input{
+   outline:none;
   }
   .theskills{
       background: #fff;
@@ -117,5 +142,19 @@ form {
       content:'X';
       color:red;
      margin-right:3px;   
+  }
+  button{
+      background: #0b6dff;
+      border:0;
+      padding:10px 20px;
+      margin-top:20px;
+      color:#fff;
+      border-radius: 20px;
+  }
+  .submit{
+      text-align: center;
+  }
+  .error{
+      border:1px solid red;
   }
 </style>
